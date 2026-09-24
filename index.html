@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Network - سيرفر رول بلاي</title>
+<style>
+  :root{
+    --royal-blue: #1e5fd6;
+    --royal-dark: #0b2a6b;
+    --royal-light: #4da3ff;
+    --royal-cyan: #6fc3ff;
+    --bg-dark: #050b1c;
+    --bg-card: rgba(20,40,90,0.55);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(30,95,214,0.25) 0%, transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(111,195,255,0.18) 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, #0d2a6b 0%, #050b1c 65%, #02060f 100%);
+    background-attachment: fixed;
+    color:#fff;
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(77,163,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(77,163,255,0.06) 1px, transparent 1px);
+    background-size:50px 50px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  body::after{
+    content:'';
+    position:fixed;
+    top:-200px;
+    left:50%;
+    transform:translateX(-50%);
+    width:700px;
+    height:700px;
+    background:radial-gradient(circle, rgba(77,163,255,0.25) 0%, transparent 70%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ===== الخلفية المتحركة ===== */
+  .bg-animation{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ===== الثلج (قليل - ديكور) ===== */
+  .snow{
+    position:absolute;
+    top:-10px;
+    background:var(--royal-light);
+    box-shadow:0 0 10px var(--royal-light);
+    animation: snowFall linear infinite;
+  }
+
+  @keyframes snowFall{
+    0%{transform: translate(0, -10px);opacity:0;}
+    10%{opacity:0.9;}
+    90%{opacity:0.9;}
+    100%{transform: translate(var(--sway), 110vh);opacity:0;}
+  }
+
+  .snow.circle{border-radius:50%;}
+  .snow.square{border-radius:2px;}
+
+  /* ===== اللوقو الطاير ===== */
+  .flying-logo{
+    position:absolute;
+    bottom:-150px;
+    border-radius:50%;
+    opacity:0.45;
+    animation: floatUp linear infinite;
+    pointer-events:none;
+  }
+
+  @keyframes floatUp{
+    0%{
+      transform: translate(0, 0) rotate(0deg) scale(1);
+      opacity:0;
+    }
+    10%{opacity:0.45;}
+    90%{opacity:0.45;}
+    100%{
+      transform: translate(var(--swayX), -140vh) rotate(360deg) scale(1.2);
+      opacity:0;
+    }
+  }
+
+  /* ===== الهيدر ===== */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:15px 40px;
+    background:rgba(8,20,50,0.85);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(77,163,255,0.3);
+    position:sticky;
+    top:0;
+    z-index:100;
+    min-height:90px;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    position:absolute;
+    right:40px;
+  }
+
+  .brand img{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    border:2px solid var(--royal-light);
+    box-shadow:0 0 18px var(--royal-light);
+  }
+
+  .brand h1{
+    font-size:26px;
+    background:linear-gradient(90deg,var(--royal-cyan),var(--royal-light),#fff);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    letter-spacing:1px;
+  }
+
+  /* ===== القائمة العلوية ===== */
+  nav{
+    width:100%;
+    display:flex;
+    justify-content:center;
+  }
+
+  nav ul{
+    display:flex;
+    list-style:none;
+    gap:5px;
+  }
+
+  nav ul li a{
+    text-decoration:none;
+    color:#7ea3d6;
+    padding:10px 20px;
+    font-weight:600;
+    font-size:16px;
+    transition:.3s;
+    display:inline-block;
+    background:transparent;
+    border:none;
+    position:relative;
+  }
+
+  nav ul li a::after{
+    content:'';
+    position:absolute;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;
+    height:2px;
+    background:var(--royal-light);
+    transition:.3s;
+  }
+
+  nav ul li a:hover{color:#fff;}
+  nav ul li a:hover::after{width:70%;}
+
+  nav ul li a.active{color:#fff;}
+  nav ul li a.active::after{
+    width:70%;
+    background:var(--royal-light);
+    box-shadow:0 0 10px var(--royal-light);
+  }
+
+  /* ===== الأقسام ===== */
+  .page{display:none;padding:50px 40px;animation:fade .5s ease;position:relative;z-index:1;}
+  .page.active{display:block;}
+
+  @keyframes fade{
+    from{opacity:0;transform:translateY(15px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  .page-title{
+    text-align:center;
+    font-size:36px;
+    margin-bottom:40px;
+    background:linear-gradient(90deg,var(--royal-cyan),var(--royal-light));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-shadow:0 0 30px rgba(77,163,255,0.3);
+  }
+
+  /* ===== الصفحة الرئيسية ===== */
+  .hero{
+    text-align:center;
+    padding:60px 20px;
+  }
+
+  .hero img{
+    width:160px;
+    height:160px;
+    border-radius:50%;
+    border:4px solid var(--royal-light);
+    box-shadow:0 0 45px var(--royal-blue);
+    margin-bottom:25px;
+  }
+
+  .hero h2{
+    font-size:44px;
+    margin-bottom:15px;
+    background:linear-gradient(90deg,#fff,var(--royal-cyan));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .hero p{
+    color:#a9c8f0;
+    font-size:19px;
+    max-width:700px;
+    margin:0 auto 30px;
+    line-height:1.8;
+  }
+
+  /* زر انضم - شفاف بالكامل */
+  .btn-join{
+    display:inline-block;
+    padding:15px 45px;
+    background:transparent;
+    color:#fff;
+    text-decoration:none;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:700;
+    border:none;
+    box-shadow:none;
+    transition:.3s;
+    cursor:pointer;
+  }
+
+  .btn-join:hover{
+    color:var(--royal-light);
+    transform:scale(1.08);
+    text-shadow:0 0 15px var(--royal-light);
+  }
+
+  /* ===== تخطيط المتجر ===== */
+  .store-layout{
+    display:flex;
+    gap:25px;
+    align-items:flex-start;
+  }
+
+  .store-sidebar{
+    min-width:220px;
+    background:var(--bg-card);
+    border:1px solid var(--royal-blue);
+    border-radius:16px;
+    padding:20px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 0 25px rgba(30,95,214,0.3);
+  }
+
+  .store-sidebar h3{
+    color:var(--royal-cyan);
+    margin-bottom:15px;
+    text-align:center;
+    border-bottom:1px solid var(--royal-blue);
+    padding-bottom:10px;
+  }
+
+  .store-sidebar button{
+    width:100%;
+    padding:12px;
+    margin-bottom:10px;
+    background:rgba(30,95,214,0.25);
+    border:1px solid var(--royal-blue);
+    color:#cfe4ff;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+  }
+
+  .store-sidebar button:hover,
+  .store-sidebar button.active{
+    background:linear-gradient(135deg,var(--royal-blue),var(--royal-dark));
+    color:#fff;
+    box-shadow:0 0 15px rgba(77,163,255,0.6);
+  }
+
+  .store-content{
+    flex:1;
+    background:var(--bg-card);
+    border:1px solid var(--royal-blue);
+    border-radius:16px;
+    padding:40px;
+    min-height:400px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    backdrop-filter:blur(10px);
+    box-shadow:0 0 25px rgba(30,95,214,0.3);
+  }
+
+  .soon-box{text-align:center;}
+
+  .soon-box h2{
+    font-size:50px;
+    color:var(--royal-light);
+    text-shadow:0 0 30px var(--royal-blue);
+    margin-bottom:10px;
+  }
+
+  .soon-box p{color:#a9c8f0;font-size:18px;}
+
+  /* ===== الفريق ===== */
+  .team-row{
+    display:flex;
+    justify-content:center;
+    gap:60px;
+    margin-bottom:50px;
+    flex-wrap:wrap;
+  }
+
+  .member{text-align:center;}
+
+  .member img{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid var(--royal-blue);
+    box-shadow:0 0 25px rgba(77,163,255,0.7);
+    transition:.3s;
+    cursor:pointer;
+  }
+
+  .member img:hover{
+    transform:scale(1.08);
+    border-color:var(--royal-cyan);
+    box-shadow:0 0 40px var(--royal-light);
+  }
+
+  .member p{
+    margin-top:15px;
+    font-size:17px;
+    font-weight:600;
+    color:#cfe4ff;
+  }
+
+  /* ===== القوانين ===== */
+  .rules-box{
+    max-width:900px;
+    margin:0 auto;
+    background:var(--bg-card);
+    border:1px solid var(--royal-blue);
+    border-radius:16px;
+    padding:35px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 0 25px rgba(30,95,214,0.3);
+  }
+
+  .rules-box h3{
+    color:var(--royal-cyan);
+    margin:20px 0 10px;
+    font-size:22px;
+  }
+
+  .rules-box p{color:#b8d2f2;line-height:1.9;font-size:16px;}
+
+  /* ===== الفوتر ===== */
+  footer{
+    text-align:center;
+    padding:25px;
+    margin-top:50px;
+    border-top:1px solid var(--royal-blue);
+    color:#7ea3d6;
+    font-size:14px;
+    position:relative;
+    z-index:1;
+  }
+
+  @media(max-width:768px){
+    header{flex-direction:column;gap:15px;padding:15px;min-height:auto;}
+    .brand{position:static;}
+    nav ul{flex-wrap:wrap;justify-content:center;}
+    .store-layout{flex-direction:column;}
+    .store-sidebar{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== الخلفية المتحركة ===== -->
+<div class="bg-animation" id="snowContainer"></div>
+<div class="bg-animation" id="floatContainer"></div>
+
+<!-- ===== الهيدر ===== -->
+<header>
+  <nav>
+    <ul>
+      <li><a href="#" class="active" onclick="showPage('home',this)">الصفحة الرئيسية</a></li>
+      <li><a href="#" onclick="showPage('rules',this)">القوانين</a></li>
+      <li><a href="#" onclick="showPage('store',this)">المتجر</a></li>
+      <li><a href="#" onclick="showPage('team',this)">الفريق</a></li>
+    </ul>
+  </nav>
+  <div class="brand">
+    <img src="https://images-ext-1.discordapp.net/external/c6icrl5TqOY1xyyIIb4itai8BEMBxj-02eqSZTwAU5c/%3Fsize%3D2048/https/cdn.discordapp.com/icons/753665930629873774/5d779545825626d11a4af9dde176a1b1.png?format=webp&quality=lossless" alt="Royal Network">
+    <h1>Royal Network</h1>
+  </div>
+</header>
+
+<!-- ===== الصفحة الرئيسية ===== -->
+<section id="home" class="page active">
+  <div class="hero">
+    <img src="https://images-ext-1.discordapp.net/external/c6icrl5TqOY1xyyIIb4itai8BEMBxj-02eqSZTwAU5c/%3Fsize%3D2048/https/cdn.discordapp.com/icons/753665930629873774/5d779545825626d11a4af9dde176a1b1.png?format=webp&quality=lossless" alt="Royal Network">
+    <h2>Royal Network</h2>
+    <p> اهلا بك في شبكـــــة رويــــــال شعارنا واحد ـ اصنع شخصيتك وابنِ قصتك وعش تجربة واقعية مليئة بالمغامرات </p>
+    <a href="https://discord.gg/x333bxBCqq" target="_blank" class="btn-join">انضم إلى السيرفر</a>
+  </div>
+</section>
+
+<!-- ===== القوانين ===== -->
+<section id="rules" class="page">
+  <h2 class="page-title">Royal Rules</h2>
+  <div class="rules-box">
+
+    <h3> قوانين الـ RolePlay</h3>
+
+    <h3>MG - Meta Gaming</h3>
+    <p>استخدام معلومات حصلت عليها خارج اللعبة داخل الرول بلاي.</p>
+
+    <h3>PG - Power Gaming</h3>
+    <p>إجبار لاعب على شيء غير منطقي أو مستحيل.</p>
+
+    <h3>DM / RDM</h3>
+    <p>قتل لاعب بدون سبب أو سيناريو رول بلاي.</p>
+
+    <h3>VDM</h3>
+    <p>استخدام المركبة كسلاح أو دهس اللاعبين بدون سبب.</p>
+
+    <h3>Fear RP</h3>
+    <p>عدم الخوف على حياتك في المواقف الخطيرة.</p>
+
+    <h3>Combat Log</h3>
+    <p>الخروج من اللعبة للهروب من موقف أو عقوبة.</p>
+
+    <h3>Fail RP</h3>
+    <p>التصرف بطريقة غير واقعية أو تخريب السيناريو.</p>
+
+    <hr style="border:none;border-top:1px solid var(--royal-blue);margin:30px 0;">
+
+    <h3> قوانين الشات والديسكورد</h3>
+
+    <p>• يمنع الـ Spam والـ Flood.</p>
+    <p>• يمنع إزعاج الإدارة أو المنشن بدون سبب.</p>
+    <p>• يمنع تسريب الرومات الخاصة أو معلومات الإدارة.</p>
+    <p>• يمنع تشغيل أصوات مزعجة في الفويس.</p>
+    <p>• يمنع استخدام الشات العام لإثارة المشاكل.</p>
+
+  </div>
+</section>
+
+<!-- ===== المتجر ===== -->
+<section id="store" class="page">
+  <h2 class="page-title">المتجر</h2>
+  <div class="store-layout">
+    <div class="store-sidebar">
+      <h3>الأقسام</h3>
+      <button onclick="showStore('vehicles',this)" class="active"> المركبات</button>
+      <button onclick="showStore('gangs',this)"> العصابات</button>
+      <button onclick="showStore('families',this)"> العائلات</button>
+      <button onclick="showStore('planes',this)"> الطائرات</button>
+    </div>
+    <div class="store-content">
+      <div class="soon-box">
+        <h2 id="soonTitle">Soon </h2>
+        <p id="soonText">هذا القسم سيتم إضافته قريباً</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== الفريق ===== -->
+<section id="team" class="page">
+  <h2 class="page-title">فريق Royal Network</h2>
+
+  <div class="team-row">
+    <div class="member">
+      <img src="https://media.discordapp.net/attachments/1551696726165946420/1552703427170271343/image.png?ex=6ab69340&is=6ab541c0&hm=92717d3cc7c98784ab5386e927735f7ae238fa4cc365d72d4279e8ba821aefe4&=&format=webp&quality=lossless&width=383&height=384" alt="عضو">
+      <p>Owner : ipc7 or Salman </p>
+    </div>
+    <div class="member">
+      <img src="https://cdn.discordapp.com/attachments/1551696726165946420/1552703026450665544/49b01b41-8586-4951-a786-bdc04ef234f9.webp?ex=6ab692e1&is=6ab54161&hm=ad67b48397cdab404acbbe890a952ab39e9908e6cfe02424f1776f8ac3f45e02&" alt="عضو">
+      <p>Owner : kxqx1 or V a M</p>
+    </div>
+  </div>
+
+  <div class="team-row">
+    <div class="member">
+      <img src="https://cdn.discordapp.com/attachments/1551696726165946420/1552702489160323162/image.png?ex=6ab69261&is=6ab540e1&hm=318e07bd36a6847bc6ffd846bac2eedc12a9b3b46ccecf2344c4b306d627b865&" alt="عضو">
+      <p>Co Owner : kvvm_ or 3zf </p>
+    </div>
+  </div>
+
+  <div class="team-row">
+    <div class="member">
+      <img src="https://cdn.discordapp.com/attachments/1551696726165946420/1552701291556503673/image.png?ex=6ab69143&is=6ab53fc3&hm=101c6b3b7cd44749633362e06582936526cdacd1c20de0e2622e94be54287b73&" alt="عضو">
+      <p>Founder : 0riven. or Riveeen </p>
+    </div>
+    <div class="member">
+      <img src="https://cdn.discordapp.com/attachments/1551696726165946420/1552700901267996693/image.png?ex=6ab690e6&is=6ab53f66&hm=9bbef458bd7ce9fb89143b361de6351a8c8f90ee7357ebf033aa4fc2bcdbafa2&" alt="عضو">
+      <p>Founder : jr_ar or Saker</p>
+    </div>
+  </div>
+
+  <div class="team-row">
+    <div class="member">
+      <img src="https://cdn.discordapp.com/attachments/1551696726165946420/1552700481388814406/image.png?ex=6ab69082&is=6ab53f02&hm=83a84f61605ea3df3a42b856e2313a619cacc07ea65d6f574c4124eaed67eb46&" alt="">
+      <p>Vice Founder : mohamaedsaeed or mohamedhassan  </p>
+    </div>
+    <div class="member">
+      <img src="https://cdn.discordapp.com/attachments/1551696726165946420/1552699827089838080/image.png?ex=6ab68fe6&is=6ab53e66&hm=47899cf2348023da671a58057d730d7fbb1346f22bc2ee10ae7e8d7a367559a1&" alt="">
+      <p>Vice Founder : _f5r1 or ToMMy</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2025 Royal Network — جميع الحقوق محفوظة
+</footer>
+
+<script>
+  /* ===== رابط اللوقو الطاير ===== */
+  const LOGO_URL = "https://media.discordapp.net/attachments/1547736308884049920/1552710869958266911/5d779545825626d11a4af9dde176a1b1.png?ex=6ab69a2f&is=6ab548af&hm=e6cc2d553a1c0cd159a7472c3352b6c2751c7509f8f3f39ed56c5dc96e7d701f&=&format=webp&quality=lossless";
+
+  /* ===== توليد الثلج (قليل - ديكور) ===== */
+  const snowContainer = document.getElementById('snowContainer');
+  const snowCount = 30;
+
+  for(let i = 0; i < snowCount; i++){
+    const snow = document.createElement('div');
+    snow.classList.add('snow');
+
+    if(Math.random() > 0.5){
+      snow.classList.add('circle');
+    } else {
+      snow.classList.add('square');
+    }
+
+    const size = Math.random() * 5 + 2;
+    snow.style.width = size + 'px';
+    snow.style.height = size + 'px';
+    snow.style.left = Math.random() * 100 + '%';
+
+    const duration = Math.random() * 4 + 3;
+    snow.style.animationDuration = duration + 's';
+    snow.style.animationDelay = (Math.random() * 6) + 's';
+
+    const sway = (Math.random() - 0.5) * 200;
+    snow.style.setProperty('--sway', sway + 'px');
+
+    snow.style.opacity = (Math.random() * 0.4 + 0.3).toFixed(2);
+    snowContainer.appendChild(snow);
+  }
+
+  /* ===== توليد اللوقو الطاير ===== */
+  const floatContainer = document.getElementById('floatContainer');
+  const floatCount = 10;
+
+  for(let i = 0; i < floatCount; i++){
+    const logo = document.createElement('img');
+    logo.classList.add('flying-logo');
+    logo.src = LOGO_URL;
+    logo.alt = "Royal Network";
+
+    logo.style.left = Math.random() * 90 + '%';
+
+    const duration = Math.random() * 8 + 8;
+    logo.style.animationDuration = duration + 's';
+    logo.style.animationDelay = (Math.random() * 12) + 's';
+
+    const swayX = (Math.random() - 0.5) * 400;
+    logo.style.setProperty('--swayX', swayX + 'px');
+
+    const size = Math.random() * 40 + 50;
+    logo.style.width = size + 'px';
+    logo.style.height = size + 'px';
+
+    floatContainer.appendChild(logo);
+  }
+
+  /* التنقل بين الصفحات */
+  function showPage(id, el){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  /* التنقل داخل المتجر */
+  const storeNames = {
+    vehicles: 'المركبات',
+    gangs: 'العصابات',
+    families: 'العائلات',
+    planes: 'الطائرات'
+  };
+
+  function showStore(key, el){
+    document.querySelectorAll('.store-sidebar button').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+
+    document.getElementById('soonTitle').innerText = storeNames[key] + ' - قريباً';
+    document.getElementById('soonText').innerText = 'قسم ' + storeNames[key] + ' سيتم إضافته قريباً';
+  }
+</script>
+
+</body>
+</html>
